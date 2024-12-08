@@ -1,53 +1,75 @@
 #include "InterfaceGraphique.h"
-#include "Grille.h"
-#include <SFML/Graphics.hpp>
+#include <iostream>
 
-InterfaceGraphique::InterfaceGraphique(Grille& grille)
-    : fenetre(sf::VideoMode(800, 600), "Jeu de la Vie"), grille(grille) {
+InterfaceGraphique::InterfaceGraphique(Grille& grille, float iterationTime)
+    : grille(grille), iterationTime(iterationTime), simulationLancee(false) {
+    unsigned int width = grille.getLargeur() * 20;
+    unsigned int height = grille.getHauteur() * 20;
+    fenetre.create(sf::VideoMode(width, height), "Jeu de la Vie");
     fenetre.setFramerateLimit(30);
-}
-
-void InterfaceGraphique::afficher() {
-    fenetre.clear();
-
-    // Accès aux cellules via obtenirCellules()
-    const auto& cellules = grille.obtenirCellules();
-    int lignes = grille.getLignes();
-    int colonnes = grille.getColonnes();
-
-    // Afficher chaque cellule en fonction de son état
-    for (int y = 0; y < lignes; ++y) {
-        for (int x = 0; x < colonnes; ++x) {
-            sf::RectangleShape cell(sf::Vector2f(20, 20));
-            cell.setPosition(x * 20, y * 20);
-
-            if (cellules[y][x].obtenirEtat()) {
-                cell.setFillColor(sf::Color::Green);  // Cellule vivante
-            } else {
-                cell.setFillColor(sf::Color::Black);  // Cellule morte
-            }
-
-            fenetre.draw(cell);
-        }
-    }
-
-    fenetre.display();
-}
-
-void InterfaceGraphique::gererEvenements() {
-    sf::Event event;
-    while (fenetre.pollEvent(event)) {
-        if (event.type == sf::Event::Closed)
-            fenetre.close();
-    }
 }
 
 void InterfaceGraphique::lancerSimulation() {
     while (fenetre.isOpen()) {
         gererEvenements();
-        grille.mettreAJour();
-        afficher();
-        sf::sleep(sf::milliseconds(100));  // Temps entre chaque itération
+
+        if (simulationLancee && clock.getElapsedTime().asSeconds() >= iterationTime) {
+            Grille ancienne = grille;
+            grille.miseAJour();
+            clock.restart();
+
+            if (grille.estIdentique(ancienne)) {
+                std::cout << "Grille stable, arrÃªt de la simulation.\n";
+                simulationLancee = false;
+            }
+        }
+
+        fenetre.clear(sf::Color::White);
+        afficherGrille();
+        fenetre.display();
     }
 }
 
+void InterfaceGraphique::afficherGrille() {
+    int cellSize = 20;
+
+    for (int x = 0; x < grille.getHauteur(); ++x) {
+        for (int y = 0; y < grille.getLargeur(); ++y) {
+            sf::RectangleShape cell(sf::Vector2f((float)cellSize - 1, (float)cellSize - 1));
+            cell.setPosition((float)(y * cellSize), (float)(x * cellSize));
+            cell.setFillColor(grille.estVivante(x, y) ? sf::Color::Green : sf::Color::Black);
+            fenetre.draw(cell);
+        }
+    }
+}
+
+void InterfaceGraphique::gererEvenements() {
+    sf::Event event;
+    while (fenetre.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            fenetre.close();
+        }
+
+        // Si on clique sur la souris (gauche) avant de lancer la simulation
+        if (!simulationLancee && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            int cellSize = 20;
+            int y = event.mouseButton.x / cellSize;
+            int x = event.mouseButton.y / cellSize;
+            if (x >= 0 && x < grille.getHauteur() && y >= 0 && y < grille.getLargeur()) {
+                bool actuel = grille.estVivante(x, y);
+                grille.setEtat(x, y, !actuel);
+            }
+        }
+
+        // Appuyer sur espace pour lancer la simulation
+        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
+            simulationLancee = true;
+            clock.restart();
+        }
+
+        // Appuyer sur Echap pour fermer la fenÃªtre
+        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+            fenetre.close();
+        }
+    }
+}
