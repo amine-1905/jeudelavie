@@ -1,15 +1,11 @@
-#ifndef CELLULE_H
-#define CELLULE_H
+#include "Cellule.h"
 
-class Cellule {
-private:
-    bool vivante;
+Cellule::Cellule(bool etat) : vivante(etat) {}
 
-public:
-    Cellule(bool etat = false);
-    bool estVivante() const;
-    void setVivante(bool etat);
-};
+bool Cellule::estVivante() const {
+    return vivante;
+}
 
-#endif // CELLULE_H
-
+void Cellule::setVivante(bool etat) {
+    vivante = etat;
+}
