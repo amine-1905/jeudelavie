@@ -6,16 +6,20 @@
 
 class InterfaceGraphique {
 private:
-    sf::RenderWindow fenetre;
     Grille& grille;
-    const int tailleCellule = 20;
+    sf::RenderWindow fenetre;
+    float iterationTime;
+    bool simulationLancee;
+    sf::Clock clock;
 
 public:
-    InterfaceGraphique(Grille& grille);
-    void afficher();
-    void gererEvenements();
+    InterfaceGraphique(Grille& grille, float iterationTime = 0.5f);
+
     void lancerSimulation();
+
+private:
+    void afficherGrille();
+    void gererEvenements();
 };
 
 #endif // INTERFACEGRAPHIQUE_H
-
