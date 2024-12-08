@@ -1,87 +1,88 @@
 #include "Grille.h"
 #include <iostream>
 
-// Constructeur : initialise une grille vide avec le nombre de lignes et de colonnes
-Grille::Grille(int l, int c) : lignes(l), colonnes(c) {
-    cellules.resize(lignes, std::vector<Cellule>(colonnes)); // Remplissage de la grille avec des cellules par défaut
+Grille::Grille(int h, int l) : hauteur(h), largeur(l) {
+    cellules.resize(hauteur, std::vector<Cellule>(largeur, Cellule(false)));
 }
 
-// Méthode pour initialiser la grille avec des états booléens pour chaque cellule
+int Grille::getHauteur() const { return hauteur; }
+int Grille::getLargeur() const { return largeur; }
+
 void Grille::initialiser(const std::vector<std::vector<bool>>& etats) {
-    for (int i = 0; i < lignes; ++i) {
-        for (int j = 0; j < colonnes; ++j) {
-            cellules[i][j] = Cellule(etats[i][j]); // Remplissage des cellules avec l'état donné (vivant ou mort)
+    for (int i = 0; i < hauteur && i < (int)etats.size(); ++i) {
+        for (int j = 0; j < largeur && j < (int)etats[i].size(); ++j) {
+            cellules[i][j].setVivante(etats[i][j]);
         }
     }
 }
 
-// Méthode pour afficher l'état actuel de la grille
-void Grille::afficher() const {
-    for (int i = 0; i < lignes; ++i) {
-        for (int j = 0; j < colonnes; ++j) {
-            std::cout << (cellules[i][j].obtenirEtat() ? "1 " : "0 ");
-        }
-        std::cout << std::endl;
+bool Grille::estVivante(int x, int y) const {
+    if (x < 0 || x >= hauteur || y < 0 || y >= largeur) {
+        return false;
+    }
+    return cellules[x][y].estVivante();
+}
+
+void Grille::setEtat(int x, int y, bool etat) {
+    if (x >= 0 && x < hauteur && y >= 0 && y < largeur) {
+        cellules[x][y].setVivante(etat);
     }
 }
 
-// Méthode pour mettre à jour la grille selon les règles du jeu de la vie
-void Grille::mettreAJour() {
-    std::vector<std::vector<Cellule>> nouvelleGrille = cellules; // Copie de la grille pour effectuer les changements sans affecter l'itération
-
-    for (int i = 0; i < lignes; ++i) {
-        for (int j = 0; j < colonnes; ++j) {
-            int voisinsVivants = compterVoisinsVivants(i, j); // Compter les voisins vivants
-
-            if (cellules[i][j].obtenirEtat()) {
-                if (voisinsVivants < 2 || voisinsVivants > 3) {
-                    nouvelleGrille[i][j].definirEtat(false); // La cellule meurt
-                }
-            } else {
-                if (voisinsVivants == 3) {
-                    nouvelleGrille[i][j].definirEtat(true); // La cellule devient vivante
-                }
-            }
-        }
-    }
-
-    cellules = nouvelleGrille; // Mise à jour de la grille
-}
-
-// Méthode pour compter le nombre de voisins vivants autour d'une cellule donnée
 int Grille::compterVoisinsVivants(int x, int y) const {
     int voisinsVivants = 0;
-
     for (int dx = -1; dx <= 1; ++dx) {
         for (int dy = -1; dy <= 1; ++dy) {
-            if (dx == 0 && dy == 0) continue; // Ignorer la cellule elle-même
-
+            if (dx == 0 && dy == 0) continue;
             int nx = x + dx;
             int ny = y + dy;
-
-            if (nx >= 0 && nx < lignes && ny >= 0 && ny < colonnes) {
-                if (cellules[nx][ny].obtenirEtat()) {
-                    voisinsVivants++; // Incrémenter le compteur si le voisin est vivant
+            if (nx >= 0 && nx < hauteur && ny >= 0 && ny < largeur) {
+                if (cellules[nx][ny].estVivante()) {
+                    voisinsVivants++;
                 }
             }
         }
     }
-
-    return voisinsVivants; // Retourner le nombre de voisins vivants
+    return voisinsVivants;
 }
 
-// Méthode pour obtenir le nombre de lignes de la grille
-int Grille::getLignes() const {
-    return lignes; // Retourne le nombre de lignes de la grille
+void Grille::miseAJour() {
+    std::vector<std::vector<Cellule>> nouvelleGrille = cellules;
+
+    for (int i = 0; i < hauteur; ++i) {
+        for (int j = 0; j < largeur; ++j) {
+            int voisins = compterVoisinsVivants(i, j);
+            bool actuel = cellules[i][j].estVivante();
+
+            if (actuel && (voisins < 2 || voisins > 3)) {
+                nouvelleGrille[i][j].setVivante(false);
+            }
+            else if (!actuel && voisins == 3) {
+                nouvelleGrille[i][j].setVivante(true);
+            }
+        }
+    }
+
+    cellules = nouvelleGrille;
 }
 
-// Méthode pour obtenir le nombre de colonnes de la grille
-int Grille::getColonnes() const {
-    return colonnes; // Retourne le nombre de colonnes de la grille
+bool Grille::estIdentique(const Grille& autre) const {
+    if (hauteur != autre.hauteur || largeur != autre.largeur) return false;
+    for (int i = 0; i < hauteur; ++i) {
+        for (int j = 0; j < largeur; ++j) {
+            if (cellules[i][j].estVivante() != autre.cellules[i][j].estVivante()) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
-// Méthode pour obtenir la matrice des cellules
-const std::vector<std::vector<Cellule>>& Grille::getCellules() const {
-    return cellules; // Retourne la matrice des cellules
+void Grille::afficherConsole() const {
+    for (int i = 0; i < hauteur; ++i) {
+        for (int j = 0; j < largeur; ++j) {
+            std::cout << (cellules[i][j].estVivante() ? "1 " : "0 ");
+        }
+        std::cout << "\n";
+    }
 }
-
