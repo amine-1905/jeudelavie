@@ -1,14 +1,17 @@
 #ifndef FICHIER_H
 #define FICHIER_H
 
-#include <vector>
 #include <string>
-#include "Grille.h"
+#include <vector>
 
 class Fichier {
 public:
-    static std::vector<std::vector<bool>> lireEtatInitial(const std::string& cheminFichier);
-    static void ecrireEtat(const std::string& cheminFichier, const Grille& grille);
+    static bool lireEtatInitial(const std::string& cheminFichier,
+        std::vector<std::vector<bool>>& etats,
+        int& hauteur, int& largeur);
+
+    static void ecrireEtat(const std::string& cheminFichier,
+        const std::vector<std::vector<bool>>& etats);
 };
 
 #endif // FICHIER_H
