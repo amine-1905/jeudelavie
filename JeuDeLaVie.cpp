@@ -1,69 +1,55 @@
 #include "JeuDeLaVie.h"
-#include <fstream>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
-// Constructeur : initialise la grille en fonction du fichier
-JeuDeLaVie::JeuDeLaVie(const std::string& cheminFichier) : grille(0, 0), iterations(0) {
-    chargerEtatInitial(cheminFichier);
-}
-
-// Méthode pour démarrer la simulation
-void JeuDeLaVie::demarrerSimulation() {
-    for (int i = 0; i < iterations; ++i) {
-        grille.afficher();
-        grille.mettreAJour();
+JeuDeLaVie::JeuDeLaVie(const std::string& fichierEntree, int iterations)
+    : grille(0, 0), maxIterations(iterations), mode(ModeAffichage::CONSOLE), iterationTime(0.5f) {
+    std::vector<std::vector<bool>> etats;
+    int h, l;
+    if (!Fichier::lireEtatInitial(fichierEntree, etats, h, l)) {
+        std::cerr << "Impossible de charger l'Ã©tat initial.\n";
+    }
+    else {
+        grille = Grille(h, l);
+        grille.initialiser(etats);
     }
 }
 
-// Méthode pour charger l'état initial de la grille depuis un fichier
-void JeuDeLaVie::chargerEtatInitial(const std::string& cheminFichier) {
-    std::ifstream fichier(cheminFichier);
-    if (!fichier.is_open()) {
-        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << cheminFichier << std::endl;
-        return;
+JeuDeLaVie::JeuDeLaVie(int hauteur, int largeur, float iterationTime)
+    : grille(hauteur, largeur), maxIterations(100), mode(ModeAffichage::GRAPHIQUE), iterationTime(iterationTime) {
+    // Grille vide au dÃ©part, mode graphique.
+}
+
+void JeuDeLaVie::executerConsole(const std::string& fichierSortie) {
+    std::cout << "Ã‰tat initial :\n";
+    grille.afficherConsole();
+
+    Grille ancienne = grille;
+    for (int it = 0; it < maxIterations; ++it) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        grille.miseAJour();
+        std::cout << "\n--- ItÃ©ration " << it + 1 << " ---\n";
+        grille.afficherConsole();
+
+        if (grille.estIdentique(ancienne)) {
+            std::cout << "Aucun changement dÃ©tectÃ©, arrÃªt.\n";
+            break;
+        }
+        ancienne = grille;
     }
 
-    int l, c; // Nombre de lignes et colonnes
-    fichier >> l >> c;
-    grille = Grille(l, c); // Assurez-vous que Grille a un constructeur qui accepte les dimensions
-
-    // Utilisation de std::vector<int> temporairement pour lire les données
-    std::vector<std::vector<int>> etatsTemp(l, std::vector<int>(c));
-    for (int i = 0; i < l; ++i) {
-        for (int j = 0; j < c; ++j) {
-            fichier >> etatsTemp[i][j];
+    // Sauvegarde de l'Ã©tat final
+    std::vector<std::vector<bool>> etatFinal(grille.getHauteur(), std::vector<bool>(grille.getLargeur(), false));
+    for (int i = 0; i < grille.getHauteur(); ++i) {
+        for (int j = 0; j < grille.getLargeur(); ++j) {
+            etatFinal[i][j] = grille.estVivante(i, j);
         }
     }
-
-    // Convertir les données lues en booléens et initialiser la grille
-    std::vector<std::vector<bool>> etats(l, std::vector<bool>(c));
-    for (int i = 0; i < l; ++i) {
-        for (int j = 0; j < c; ++j) {
-            etats[i][j] = (etatsTemp[i][j] == 1);
-        }
-    }
-    grille.initialiser(etats); // Initialiser la grille avec les états
-
-    fichier.close();
+    Fichier::ecrireEtat(fichierSortie, etatFinal);
 }
 
-// Méthode pour sauvegarder l'état actuel de la grille dans un fichier
-void JeuDeLaVie::sauvegarderEtat(const std::string& cheminFichier) {
-    std::ofstream fichier(cheminFichier);
-    if (!fichier.is_open()) {
-        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << cheminFichier << std::endl;
-        return;
-    }
-
-    fichier << grille.getLignes() << " " << grille.getColonnes() << std::endl;
-    // Accédez aux cellules de la grille et enregistrez leur état
-    for (const auto& ligne : grille.getCellules()) {
-        for (const auto& cellule : ligne) {
-            fichier << (cellule.obtenirEtat() ? 1 : 0) << " ";
-        }
-        fichier << std::endl;
-    }
-
-    fichier.close();
+void JeuDeLaVie::demarrerSimulationGraphique() {
+    InterfaceGraphique interfaceGraphique(grille, iterationTime);
+    interfaceGraphique.lancerSimulation();
 }
-
