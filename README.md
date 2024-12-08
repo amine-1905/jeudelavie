@@ -10,7 +10,7 @@ Dépendances
 Installation
 1. Cloner le Projet
 2. Installer SFML
-3. Configurer Dev-C++
+3. Configurer Visual Studio 2022
 Compilation
 Utilisation
 Mode Console
@@ -19,6 +19,7 @@ Exemple
 Débogage
 Contributions
 Licence
+Auteurs
 Contact
 Fonctionnalités
 Deux Modes d'Affichage :
@@ -30,8 +31,7 @@ Lecture : Importation de l'état initial depuis un fichier texte.
 Règles du Jeu de la Vie :
 Application des règles de naissance et de mort des cellules pour chaque itération.
 Structure du Projet
-css
-Copier le code
+
 JeuDeLaVie/
 ├── include/
 │   ├── Cellule.h
@@ -47,11 +47,13 @@ JeuDeLaVie/
 │   ├── InterfaceGraphique.cpp
 │   └── main.cpp
 ├── input.txt
-└── README.md
+├── resultat.txt
+└── JeuDeLaVie.sln
 include/ : Contient tous les fichiers d'en-tête (.h).
 src/ : Contient tous les fichiers sources (.cpp).
 input.txt : Fichier d'entrée contenant l'état initial de la grille.
-README.md : Ce fichier.
+resultat.txt : Fichier de sortie contenant l'état final de la grille après simulation.
+JeuDeLaVie.sln : Solution Visual Studio 2022.
 Dépendances
 Langage : C++17
 Bibliothèques :
@@ -60,63 +62,66 @@ Installation
 1. Cloner le Projet
 Clonez ce dépôt ou téléchargez-le en tant qu'archive ZIP et extrayez-le dans votre répertoire de travail préféré.
 
-bash
-Copier le code
-git clone https://github.com/votre-utilisateur/JeuDeLaVie.git
+
 2. Installer SFML
 Téléchargement :
 
 Rendez-vous sur le site officiel de SFML.
-Téléchargez la version correspondant à votre compilateur (par exemple, GCC 7.3 MinGW (DW2) si vous utilisez Dev-C++ avec MinGW 7.3).
+Téléchargez la version correspondant à votre compilateur. Pour Visual Studio 2022, choisissez la version Visual C++ 17 (MSVC 17) - 64-bit.
 Extraction :
 
 Extrayez le contenu de l'archive téléchargée dans un dossier, par exemple C:\SFML.
 Copie des DLL :
 
-Dans le dossier C:\SFML\bin, copiez les DLL nécessaires (sfml-graphics-2.dll, sfml-window-2.dll, sfml-system-2.dll, etc.) dans le même répertoire que votre exécutable après la compilation (jeu.exe), ou ajoutez C:\SFML\bin à votre variable d'environnement PATH.
-3. Configurer Dev-C++
-Ouvrir Dev-C++ :
+Dans le dossier C:\SFML\bin, copiez les DLL nécessaires (sfml-graphics-2.dll, sfml-window-2.dll, sfml-system-2.dll, etc.) dans le même répertoire que votre exécutable après la compilation (JeuDeLaVie.exe), ou ajoutez C:\SFML\bin à votre variable d'environnement PATH.
+3. Configurer Visual Studio 2022
+Ouvrir Visual Studio 2022 :
 
-Lancez Dev-C++ sur votre ordinateur.
-Ajouter les Répertoires d'Inclure et de Lib SFML :
+Lancez Visual Studio 2022 sur votre ordinateur.
+Ouvrir la Solution :
 
-Allez dans Outils > Options du compilateur > Répertoires.
-Sous Inclure, ajoutez le chemin vers le dossier include de SFML (par exemple, C:\SFML\include).
-Sous Bibliothèques, ajoutez le chemin vers le dossier lib de SFML (par exemple, C:\SFML\lib).
-Ajouter les Options du Compilateur et du Linker :
+Ouvrez le fichier JeuDeLaVie.sln situé à la racine du projet.
+Configurer les Répertoires d'Inclure et de Lib SFML :
 
-Allez dans Projet > Options du projet > Paramètres du compilateur.
-Dans la section Paramètres supplémentaires du compilateur, ajoutez :
-c
-Copier le code
--std=c++17
-Dans la section Linker, ajoutez les librairies SFML :
-sql
-Copier le code
--lsfml-graphics -lsfml-window -lsfml-system
+Inclure :
+Faites un clic droit sur le projet dans l'Explorateur de solutions et sélectionnez Propriétés.
+Allez dans C/C++ > Général > Répertoires des fichiers d'inclusion supplémentaires.
+Ajoutez le chemin vers le dossier include de SFML (par exemple, C:\SFML\include).
+Bibliothèques :
+Toujours dans les Propriétés du projet, allez dans Linker > Général > Répertoires des fichiers de bibliothèque supplémentaires.
+Ajoutez le chemin vers le dossier lib de SFML (par exemple, C:\SFML\lib).
+Ajouter les Librairies SFML :
+
+Dans les Propriétés du projet, allez dans Linker > Input > Dépendances supplémentaires.
+Ajoutez les librairies SFML nécessaires :
+vbnet
+
+sfml-graphics.lib
+sfml-window.lib
+sfml-system.lib
+sfml-main.lib
+Configurer le Répertoire de Sortie des DLL :
+
+Assurez-vous que les DLL de SFML sont accessibles lors de l'exécution :
+Copiez les DLL de C:\SFML\bin dans le dossier de sortie de votre projet (généralement Debug ou Release).
+OU
+Ajoutez C:\SFML\bin à votre variable d'environnement PATH.
 Compilation
-Créer un Nouveau Projet :
+Construire la Solution :
 
-Ouvrez Dev-C++.
-Allez dans Fichier > Nouveau > Projet.
-Sélectionnez Console Application ou Empty Project.
-Nommez votre projet (par exemple, JeuDeLaVie) et choisissez un emplacement approprié.
-Ajouter les Fichiers Sources :
+Dans Visual Studio, allez dans le menu Build et sélectionnez Build Solution (ou appuyez sur Ctrl + Shift + B).
+Assurez-vous qu'il n'y a pas d'erreurs de compilation.
+Exécuter le Projet :
 
-Une fois le projet créé, allez dans Projet > Ajouter un fichier existant.
-Sélectionnez et ajoutez tous vos fichiers sources (Cellule.cpp, Grille.cpp, Fichier.cpp, JeuDeLaVie.cpp, InterfaceGraphique.cpp, main.cpp).
-Compiler le Projet :
-
-Cliquez sur Compiler & Exécuter ou appuyez sur F11.
-Si la compilation réussit, un exécutable (jeu.exe) sera généré dans le dossier de sortie spécifié.
+Une fois la compilation réussie, exécutez le programme en appuyant sur F5 ou en cliquant sur Start.
 Utilisation
 Mode Console
 Préparation :
 
-Assurez-vous que le fichier input.txt est présent dans le répertoire racine du projet.
+Assurez-vous que le fichier input.txt est présent dans le répertoire de sortie (Debug ou Release).
 Exécution :
 
-Lancez jeu.exe.
+Lancez JeuDeLaVie.exe.
 Entrez 1 pour sélectionner le mode console.
 Fonctionnement :
 
@@ -124,10 +129,10 @@ Le programme lira l'état initial depuis input.txt, effectuera les itérations s
 Mode Graphique
 Préparation :
 
-Assurez-vous que les DLL SFML sont présentes dans le même dossier que jeu.exe.
+Assurez-vous que les DLL SFML sont présentes dans le même dossier que JeuDeLaVie.exe.
 Exécution :
 
-Lancez jeu.exe.
+Lancez JeuDeLaVie.exe.
 Entrez 2 pour sélectionner le mode graphique.
 Fonctionnement :
 
@@ -140,7 +145,7 @@ Exemple
 input.txt
 Voici un exemple de fichier input.txt pour initialiser la grille :
 
-Copier le code
+
 5 10
 0 0 1 0 0 0 0 0 0 0
 0 0 0 1 0 0 0 0 0 0
@@ -155,25 +160,25 @@ Si vous rencontrez des problèmes lors de la compilation ou de l'exécution, voi
 
 Messages d'Erreur :
 
-Lisez attentivement les messages d'erreur pour identifier le fichier et la ligne où le problème se produit.
+Lisez attentivement les messages d'erreur dans Visual Studio pour identifier le fichier et la ligne où le problème se produit.
 Vérifier les Inclusions :
 
 Assurez-vous que tous les fichiers headers sont correctement inclus avec des guillemets doubles (" ") et non des crochets (< >).
 Chemins Corrects :
 
-Vérifiez que les chemins vers les fichiers headers et les bibliothèques SFML sont correctement configurés dans Dev-C++.
+Vérifiez que les chemins vers les fichiers headers et les bibliothèques SFML sont correctement configurés dans Visual Studio.
 Gardes d'Inclusion :
 
 Chaque fichier header doit avoir des gardes d'inclusion uniques pour éviter les inclusions multiples.
 Compatibilité SFML :
 
-Assurez-vous que la version de SFML correspond à celle de votre compilateur MinGW utilisé par Dev-C++.
+Assurez-vous que la version de SFML correspond à celle de votre compilateur Visual Studio 2022.
 DLL Manquantes :
 
-Pour le mode graphique, assurez-vous que toutes les DLL SFML nécessaires sont présentes dans le même dossier que jeu.exe.
+Pour le mode graphique, assurez-vous que toutes les DLL SFML nécessaires sont présentes dans le même dossier que JeuDeLaVie.exe.
 Nettoyer et Recompiler :
 
-Parfois, nettoyer le projet (supprimer les fichiers objets) et recompiler entièrement peut résoudre des problèmes de compilation.
+Parfois, nettoyer le projet (supprimer les fichiers intermédiaires) et recompiler entièrement peut résoudre des problèmes de compilation.
 Contributions
 Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce projet, veuillez suivre ces étapes :
 
@@ -182,3 +187,21 @@ Créer une Branche (git checkout -b feature/amélioration)
 Commiter vos Changements (git commit -m 'Ajout d'une nouvelle fonctionnalité')
 Pousser vers la Branche (git push origin feature/amélioration)
 Ouvrir une Pull Request
+Licence
+Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
+
+Auteurs
+Ce projet a été réalisé par le binôme Berraki et Bouchou.(groupe21)
+
+Contact
+Pour toute question ou suggestion, veuillez contacter :
+
+Berraki
+
+Email : berraki@example.com
+GitHub : https://github.com/berraki
+Bouchou
+
+Email : bouchou@example.com
+GitHub : https://github.com/bouchou
+Merci d'avoir choisi Jeu de la Vie ! Nous espérons que ce projet vous sera utile et inspirant.
