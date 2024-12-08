@@ -1,20 +1,15 @@
-#include "Cellule.h"
+#ifndef CELLULE_H
+#define CELLULE_H
 
-Cellule::Cellule(bool etat) : etat(etat) {}
+class Cellule {
+private:
+    bool vivante;
 
-void Cellule::definirEtat(bool nouvelEtat) {
-    etat = nouvelEtat;
-}
+public:
+    Cellule(bool etat = false);
+    bool estVivante() const;
+    void setVivante(bool etat);
+};
 
-bool Cellule::obtenirEtat() const {
-    return etat;
-}
-
-bool Cellule::calculerNouvelEtat(int voisinsVivants) const {
-    if (etat) {
-        return (voisinsVivants == 2 || voisinsVivants == 3);
-    } else {
-        return (voisinsVivants == 3);
-    }
-}
+#endif // CELLULE_H
 
