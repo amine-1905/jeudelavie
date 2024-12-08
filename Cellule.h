@@ -3,13 +3,12 @@
 
 class Cellule {
 private:
-    bool etat; // État actuel de la cellule (vivante ou morte)
+    bool vivante;
 
 public:
-    Cellule(bool etat = false);       // Constructeur
-    void definirEtat(bool nouvelEtat); // Change l'état de la cellule
-    bool obtenirEtat() const;         // Renvoie l'état de la cellule
-    bool calculerNouvelEtat(int voisinsVivants) const; // Détermine le nouvel état
+    Cellule(bool etat = false);
+    bool estVivante() const;
+    void setVivante(bool etat);
 };
 
 #endif // CELLULE_H
