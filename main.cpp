@@ -20,7 +20,7 @@ int main() {
     else if (choixMode == 2) {
         int hauteur = 40;
         int largeur = 40;
-        float iterationTime = 0.5f; // Temps en secondes entre les itérations
+        float iterationTime = 0.5f;
         JeuDeLaVie jeu(hauteur, largeur, iterationTime);
         jeu.demarrerSimulationGraphique();
     }
@@ -30,4 +30,3 @@ int main() {
 
     return 0;
 }
-
